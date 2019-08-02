@@ -29,8 +29,8 @@ public class TicTacToe extends JPanel {
     }
 
     public void initializebuttons() {
-        for(int i = 0; i <= 8; i++)
-        {
+        for(int i = 0; i <= 8; i++) {
+
             buttons[i] = new JButton();
             buttons[i].setText("");
             buttons[i].addActionListener(new buttonListener());
@@ -48,9 +48,9 @@ public class TicTacToe extends JPanel {
         buttons[11].setText("Train");
         add(buttons[11]);
     }
+
     public void resetButtons() {
-        for(int i = 0; i <= 8; i++)
-        {
+        for(int i = 0; i <= 8; i++) {
             buttons[i].setText("");
         }
     }
@@ -58,19 +58,19 @@ public class TicTacToe extends JPanel {
     // when a button is clicked, it generates an ActionEvent. Thus, each button needs an ActionListener. When it is clicked, it goes to this listener class that I have created and goes to the actionPerformed method. There (and in this class), we decide what we want to do.
     private class buttonListener implements ActionListener {
 
-        public void actionPerformed(ActionEvent e)
-        {
+        public void actionPerformed(ActionEvent e) {
 
             JButton buttonClicked = (JButton)e.getSource(); //get the particular button that was clicked
             if (buttonClicked.getText() == "") {
-                if(alternate%2 == 0)
+                if(alternate%2 == 0) {
                     buttonClicked.setText("X");
-                else
+                }
+                else {
                     buttonClicked.setText("O");
-
-                if(checkForWin() == true)
-                {
+                }
+                if(checkForWin() == true) {
                     JOptionPane.showConfirmDialog(null, "Game Over.");
+                    // Write to a log how the match ended before resetting to see how the machine learning goes
                     resetButtons();
                 }
                 alternate++;
@@ -78,7 +78,6 @@ public class TicTacToe extends JPanel {
             else {
                 System.out.println("Try again");
             }
-
         }
 
         public boolean checkForWin() {
@@ -110,8 +109,6 @@ public class TicTacToe extends JPanel {
                 return true;
             else
                 return false;
-
-
         }
 
         public boolean checkAdjacent(int a, int b) {
@@ -120,7 +117,5 @@ public class TicTacToe extends JPanel {
             else
                 return false;
         }
-
     }
-
 }
