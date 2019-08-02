@@ -1,122 +1,125 @@
-import java.util.Arrays;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
 
-/**
- * 
- * @author MeneXia (Xavi Ablaza)
- *
- */
-public class TicTacToe {
-	static Scanner in;
-	static String[] board;
-	static String turn;
-
-	public static void main(String[] args) {
-		in = new Scanner(System.in);
-		board = new String[9];
-		turn = "X";
-		String winner = null;
-		populateEmptyBoard();
-
-		System.out.println("Welcome to 2 Player Tic Tac Toe.");
-		System.out.println("--------------------------------");
-		printBoard();
-		System.out.println("X's will play first. Enter a slot number to place X in:");
-
-		while (winner == null) {
-			int numInput;
-			try {
-				numInput = in.nextInt();
-				if (!(numInput > 0 && numInput <= 9)) {
-					System.out.println("Invalid input; re-enter slot number:");
-					continue;
+public class TicTacToe extends JPanel
+{
+    JButton buttons[] = new JButton[12]; 
+    int alternate = 0;//if this number is a even, then put a X. If it's odd, then put an O
+    
+    public TicTacToe()
+    {
+      setLayout(new GridLayout(4,4));
+      initializebuttons(); 
+    }
+    
+    public void initializebuttons()
+    {
+        for(int i = 0; i <= 8; i++)
+        {
+            buttons[i] = new JButton();
+            buttons[i].setText("");
+            buttons[i].addActionListener(new buttonListener());
+            
+            add(buttons[i]); //adds this button to JPanel (note: no need for JPanel.add(...)
+                                //because this whole class is a JPanel already           
+        }
+		buttons[9] = new JButton();
+		buttons[9].setText("PvE");
+		add(buttons[9]);
+		buttons[10] = new JButton();
+		buttons[10].setText("Difficulty: Easy");
+		add(buttons[10]);
+		buttons[11] = new JButton();
+		buttons[11].setText("Train");
+		add(buttons[11]);
+    }
+    public void resetButtons()
+    {
+        for(int i = 0; i <= 8; i++)
+        {
+            buttons[i].setText("");
+        }
+    }
+    
+// when a button is clicked, it generates an ActionEvent. Thus, each button needs an ActionListener. When it is clicked, it goes to this listener class that I have created and goes to the actionPerformed method. There (and in this class), we decide what we want to do.
+    private class buttonListener implements ActionListener
+    {
+       
+        public void actionPerformed(ActionEvent e) 
+        {
+            
+            JButton buttonClicked = (JButton)e.getSource(); //get the particular button that was clicked
+			if (buttonClicked.getText() == "") {
+				if(alternate%2 == 0)
+					buttonClicked.setText("X");
+				else
+					buttonClicked.setText("O");
+				
+				if(checkForWin() == true)
+				{
+					JOptionPane.showConfirmDialog(null, "Game Over.");
+					resetButtons();
 				}
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input; re-enter slot number:");
-				continue;
+				alternate++;
 			}
-			if (board[numInput-1].equals(String.valueOf(numInput))) {
-				board[numInput-1] = turn;
-				if (turn.equals("X")) {
-					turn = "O";
-				} else {
-					turn = "X";
-				}
-				printBoard();
-				winner = checkWinner();
-			} else {
-				System.out.println("Slot already taken; re-enter slot number:");
-				continue;
+            else {
+				System.out.println("Try again");
 			}
-		}
-		if (winner.equalsIgnoreCase("draw")) {
-			System.out.println("It's a draw! Thanks for playing.");
-		} else {
-			System.out.println("Congratulations! " + winner + "'s have won! Thanks for playing.");
-		}
-	}
-
-	static String checkWinner() {
-		for (int a = 0; a < 8; a++) {
-			String line = null;
-			switch (a) {
-			case 0:
-				line = board[0] + board[1] + board[2];
-				break;
-			case 1:
-				line = board[3] + board[4] + board[5];
-				break;
-			case 2:
-				line = board[6] + board[7] + board[8];
-				break;
-			case 3:
-				line = board[0] + board[3] + board[6];
-				break;
-			case 4:
-				line = board[1] + board[4] + board[7];
-				break;
-			case 5:
-				line = board[2] + board[5] + board[8];
-				break;
-			case 6:
-				line = board[0] + board[4] + board[8];
-				break;
-			case 7:
-				line = board[2] + board[4] + board[6];
-				break;
-			}
-			if (line.equals("XXX")) {
-				return "X";
-			} else if (line.equals("OOO")) {
-				return "O";
-			}
-		}
-
-		for (int a = 0; a < 9; a++) {
-			if (Arrays.asList(board).contains(String.valueOf(a+1))) {
-				break;
-			}
-			else if (a == 8) return "draw";
-		}
-
-		System.out.println(turn + "'s turn; enter a slot number to place " + turn + " in:");
-		return null;
-	}
-
-	static void printBoard() {
-		System.out.println("/---|---|---\\");
-		System.out.println("| " + board[0] + " | " + board[1] + " | " + board[2] + " |");
-		System.out.println("|-----------|");
-		System.out.println("| " + board[3] + " | " + board[4] + " | " + board[5] + " |");
-		System.out.println("|-----------|");
-		System.out.println("| " + board[6] + " | " + board[7] + " | " + board[8] + " |");
-		System.out.println("/---|---|---\\");
-	}
-
-	static void populateEmptyBoard() {
-		for (int a = 0; a < 9; a++) {
-			board[a] = String.valueOf("-");
-		}
-	}
+            
+        }
+        
+        public boolean checkForWin()
+        {
+            /**   Reference: the button array is arranged like this as the board
+             *      0 | 1 | 2
+             *      3 | 4 | 5
+             *      6 | 7 | 8
+             */
+            //horizontal win check
+            if( checkAdjacent(0,1) && checkAdjacent(1,2) ) //no need to put " == true" because the default check is for true
+                return true;
+            else if( checkAdjacent(3,4) && checkAdjacent(4,5) )
+                return true;
+            else if ( checkAdjacent(6,7) && checkAdjacent(7,8))
+                return true;
+            
+            //vertical win check
+            else if ( checkAdjacent(0,3) && checkAdjacent(3,6))
+                return true;  
+            else if ( checkAdjacent(1,4) && checkAdjacent(4,7))
+                return true;
+            else if ( checkAdjacent(2,5) && checkAdjacent(5,8))
+                return true;
+            
+            //diagonal win check
+            else if ( checkAdjacent(0,4) && checkAdjacent(4,8))
+                return true;  
+            else if ( checkAdjacent(2,4) && checkAdjacent(4,6))
+                return true;
+            else 
+                return false;
+            
+            
+        }
+        
+        public boolean checkAdjacent(int a, int b)
+        {
+            if ( buttons[a].getText().equals(buttons[b].getText()) && !buttons[a].getText().equals("") )
+                return true;
+            else
+                return false;
+        }
+        
+    }
+    
+    public static void main(String[] args) 
+    {
+        JFrame window = new JFrame("Tic-Tac-Toe");
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.getContentPane().add(new TicTacToe());
+        window.setBounds(300,200,300,300);
+        window.setVisible(true);
+    }
 }
